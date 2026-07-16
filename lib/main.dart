@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_colors.dart';
 
@@ -18,10 +18,7 @@ class PortalMedicoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Portal Médico',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary600),
-      ),
+      theme: AppTheme.light(),
       home: const HomeShell(), // temporal — aquí normalmente iría LoginScreen
     );
   }
