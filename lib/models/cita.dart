@@ -2,10 +2,10 @@
 enum EstadoCita { programada, atendida, cancelada }
 
 class Cita {
-  final int id;
-  final int pacienteId;            // patientId
+  final String id;
+  final String pacienteId;            // patientId
   final String pacienteNombre;     // patientName  (denormalizado)
-  final int doctorId;              // doctorId
+  final String doctorId;              // doctorId
   final String doctorNombre;       // doctorName   (denormalizado)
   final String especialidadNombre; // specialtyName(denormalizado)
   final DateTime inicia;           // startsAt (ISO 8601)
@@ -32,10 +32,10 @@ class Cita {
 
   factory Cita.fromJson(Map<String, dynamic> json) {
     return Cita(
-      id: json['id'] as int,
-      pacienteId: json['patientId'] as int,
+      id: json['id'] as String,
+      pacienteId: json['patientId'] as String,
       pacienteNombre: json['patientName'] as String,
-      doctorId: json['doctorId'] as int,
+      doctorId: json['doctorId'] as String,
       doctorNombre: json['doctorName'] as String,
       especialidadNombre: json['specialtyName'] as String,
       inicia: DateTime.parse(json['startsAt'] as String),

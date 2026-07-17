@@ -1,7 +1,7 @@
 import 'especialidad.dart';
 
 class Doctor {
-  final int id;
+  final String id;
   final String nombreCompleto;      // fullName
   final String email;
   final Especialidad especialidad;  // specialty (objeto)
@@ -19,7 +19,7 @@ class Doctor {
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
-      id: json['id'] as int,
+      id: json['id'] as String,
       nombreCompleto: json['fullName'] as String,
       email: json['email'] as String,
       especialidad: Especialidad.fromJson(json['specialty'] as Map<String, dynamic>),
