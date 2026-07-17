@@ -30,6 +30,21 @@ class Cita {
   DateTime get termina => inicia.add(const Duration(minutes: 30));
   bool get atendida => estado == EstadoCita.atendida;
 
+  Cita copyWith({EstadoCita? estado, String? notaMedica}) {
+    return Cita(
+      id: id,
+      pacienteId: pacienteId,
+      pacienteNombre: pacienteNombre,
+      doctorId: doctorId,
+      doctorNombre: doctorNombre,
+      especialidadNombre: especialidadNombre,
+      inicia: inicia,
+      motivo: motivo,
+      estado: estado ?? this.estado,
+      notaMedica: notaMedica ?? this.notaMedica,
+    );
+  }
+
   factory Cita.fromJson(Map<String, dynamic> json) {
     return Cita(
       id: json['id'] as String,

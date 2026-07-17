@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../data/mock_citas.dart';
+import '../data/citas_store.dart';
 import '../models/cita.dart';
 import '../theme/app_colors.dart';
 
@@ -22,9 +22,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   List<Cita> get _consultas {
-    if (_filtro.trim().isEmpty) return historialMock;
+    if (_filtro.trim().isEmpty) return citasStore.historial;
     final q = _filtro.toLowerCase();
-    return historialMock
+    return citasStore.historial
         .where((c) => c.pacienteNombre.toLowerCase().contains(q))
         .toList();
   }
@@ -39,8 +39,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final consultas = _consultas;
-
     return Scaffold(
       appBar: AppBar(title: const Text('Historial de Consultas')),
       body: SafeArea(
@@ -61,17 +59,26 @@ class _HistorialScreenState extends State<HistorialScreen> {
               ),
             ),
             Expanded(
-              child: consultas.isEmpty
-                  ? const Center(child: Text('Sin consultas para ese paciente'))
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      itemCount: consultas.length,
-                     separatorBuilder: (context, index) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _TarjetaConsulta(
-                        cita: consultas[i],
-                        onTap: () => _mostrarDetalle(consultas[i]),
-                      ),
+              child: ListenableBuilder(
+                listenable: citasStore,
+                builder: (context, _) {
+                  final consultas = _consultas;
+                  if (consultas.isEmpty) {
+                    return const Center(
+                        child: Text('Sin consultas para ese paciente'));
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    itemCount: consultas.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                    itemBuilder: (_, i) => _TarjetaConsulta(
+                      cita: consultas[i],
+                      onTap: () => _mostrarDetalle(consultas[i]),
                     ),
+                  );
+                },
+              ),
             ),
           ],
         ),
