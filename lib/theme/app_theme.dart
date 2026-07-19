@@ -7,7 +7,8 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: AppColors.neutral50, 
+      // Transparente para que se vea el fondo global (GradientBlobBackground).
+      scaffoldBackgroundColor: Colors.transparent,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary600,
         primary: AppColors.primary600,

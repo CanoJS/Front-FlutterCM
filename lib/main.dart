@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-
+import 'screens/login_screen.dart';
+import 'widgets/gradient_blob_background.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,10 @@ class PortalMedicoApp extends StatelessWidget {
       title: 'Portal Médico',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const HomeShell(), // temporal — aquí normalmente iría LoginScreen
+      // Envuelve TODAS las pantallas con el fondo (degradado + blobs) una sola vez.
+      builder: (context, child) =>
+          GradientBlobBackground(child: child ?? const SizedBox.shrink()),
+      home: const LoginScreen(), // arranca en el login
     );
   }
 }

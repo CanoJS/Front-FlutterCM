@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../data/citas_store.dart';
 import '../models/cita.dart';
 import '../theme/app_colors.dart';
+import '../widgets/perfil_medico.dart';
 
 class HistorialScreen extends StatefulWidget {
   const HistorialScreen({super.key});
@@ -40,7 +41,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Historial de Consultas')),
+      appBar: AppBar(
+        title: const Text('Historial de Consultas'),
+        actions: const [AvatarMedico()],
+      ),
+      endDrawer: const MedicoDrawer(),
       body: SafeArea(
         child: Column(
           children: [
