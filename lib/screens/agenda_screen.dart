@@ -8,6 +8,7 @@ import '../utils/fechas.dart';
 import '../widgets/agenda/detalle_cita.dart';
 import '../widgets/agenda/rejilla_semana.dart';
 import '../widgets/agenda/vista_mes.dart';
+import '../widgets/perfil_medico.dart';
 import '../widgets/tarjeta_blanca.dart';
 import '../widgets/tarjeta_cita.dart';
 
@@ -81,7 +82,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Agenda')),
+      appBar: AppBar(
+        title: const Text('Agenda'),
+        actions: const [AvatarMedico()],
+      ),
+      endDrawer: const MedicoDrawer(),
       body: SafeArea(
         child: Column(
           children: [
