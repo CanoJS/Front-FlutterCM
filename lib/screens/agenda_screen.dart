@@ -56,6 +56,27 @@ class _AgendaScreenState extends State<AgendaScreen> {
     );
   }
 
+  Widget _errorCarga() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.cloud_off, size: 40, color: AppColors.neutral400),
+          const SizedBox(height: 12),
+          Text(citasStore.error ?? 'Ocurrió un error',
+              style: const TextStyle(color: AppColors.neutral400)),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () {
+              citasStore.cargar();
+            },
+            child: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _segmento(String texto, IconData icono, _Vista v) {
     final seleccionado = _vista == v;
     final color = seleccionado ? AppColors.primary600 : AppColors.neutral400;
@@ -114,6 +135,12 @@ class _AgendaScreenState extends State<AgendaScreen> {
               child: ListenableBuilder(
                 listenable: citasStore,
                 builder: (_, _) {
+                  if (citasStore.cargando && citasStore.agenda.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (citasStore.error != null && citasStore.agenda.isEmpty) {
+                    return _errorCarga();
+                  }
                   switch (_vista) {
                     case _Vista.mes:
                       return TarjetaBlanca(

@@ -12,6 +12,7 @@ class Cita {
   final String motivo;             // reason
   final EstadoCita estado;         // status
   final String? notaMedica;        // medicalNote (puede ser null)
+  final String version;            // version (concurrencia optimista)
 
   const Cita({
     required this.id,
@@ -24,13 +25,14 @@ class Cita {
     required this.motivo,
     required this.estado,
     required this.notaMedica,
+    this.version = '',
   });
 
  
   DateTime get termina => inicia.add(const Duration(minutes: 30));
   bool get atendida => estado == EstadoCita.atendida;
 
-  Cita copyWith({EstadoCita? estado, String? notaMedica}) {
+  Cita copyWith({EstadoCita? estado, String? notaMedica, String? version}) {
     return Cita(
       id: id,
       pacienteId: pacienteId,
@@ -42,34 +44,39 @@ class Cita {
       motivo: motivo,
       estado: estado ?? this.estado,
       notaMedica: notaMedica ?? this.notaMedica,
+      version: version ?? this.version,
     );
   }
 
   factory Cita.fromJson(Map<String, dynamic> json) {
+    String texto(String clave) => (json[clave] as String?) ?? '';
     return Cita(
-      id: json['id'] as String,
-      pacienteId: json['patientId'] as String,
-      pacienteNombre: json['patientName'] as String,
-      doctorId: json['doctorId'] as String,
-      doctorNombre: json['doctorName'] as String,
-      especialidadNombre: json['specialtyName'] as String,
-      inicia: DateTime.parse(json['startsAt'] as String),
-      motivo: json['reason'] as String,
-      estado: _estadoDesde(json['status'] as String),
+      id: texto('id'),
+      pacienteId: texto('patientId'),
+      pacienteNombre: texto('patientName'),
+      doctorId: texto('doctorId'),
+      doctorNombre: texto('doctorName'),
+      especialidadNombre: texto('specialtyName'),
+      inicia: DateTime.parse(json['startsAt'] as String).toLocal(),
+      motivo: texto('reason'),
+      estado: _estadoDesde(texto('status')),
       notaMedica: json['medicalNote'] as String?,
+      version: texto('version'),
     );
   }
 }
 
 EstadoCita _estadoDesde(String valor) {
-  switch (valor) {
-    case 'SCHEDULED':
-      return EstadoCita.programada;
+  switch (valor.toUpperCase()) {
     case 'ATTENDED':
+    case 'COMPLETED':
       return EstadoCita.atendida;
     case 'CANCELLED':
+    case 'CANCELED':
       return EstadoCita.cancelada;
+    case 'SCHEDULED':
+    case 'PENDING':
     default:
-      throw ArgumentError('Estado de cita desconocido: $valor');
+      return EstadoCita.programada;
   }
 }

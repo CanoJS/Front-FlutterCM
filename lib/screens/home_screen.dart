@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/citas_store.dart';
 import '../theme/app_colors.dart'; // ajusta si tu ruta difiere
 import 'agenda_screen.dart';
 import 'historial_screen.dart';
@@ -18,6 +19,13 @@ class _HomeShellState extends State<HomeShell> {
     AgendaScreen(),
     HistorialScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Carga las citas del médico al entrar al portal.
+    citasStore.cargar();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -38,6 +38,27 @@ class _HistorialScreenState extends State<HistorialScreen> {
     );
   }
 
+  Widget _errorCarga() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.cloud_off, size: 40, color: AppColors.neutral400),
+          const SizedBox(height: 12),
+          Text(citasStore.error ?? 'Ocurrió un error',
+              style: const TextStyle(color: AppColors.neutral400)),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () {
+              citasStore.cargar();
+            },
+            child: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +88,13 @@ class _HistorialScreenState extends State<HistorialScreen> {
               child: ListenableBuilder(
                 listenable: citasStore,
                 builder: (context, _) {
+                  if (citasStore.cargando && citasStore.historial.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (citasStore.error != null &&
+                      citasStore.historial.isEmpty) {
+                    return _errorCarga();
+                  }
                   final consultas = _consultas;
                   if (consultas.isEmpty) {
                     return const Center(
