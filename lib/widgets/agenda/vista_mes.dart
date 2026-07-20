@@ -32,9 +32,12 @@ class VistaMes extends StatelessWidget {
     final hoy = DateTime.now();
     const encabezados = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
-      child: Column(
+    return RefreshIndicator(
+      onRefresh: citasStore.cargar,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
+        child: Column(
         children: [
           Row(
             children: [
@@ -62,6 +65,7 @@ class VistaMes extends StatelessWidget {
               ],
             ),
         ],
+      ),
       ),
     );
   }
@@ -141,7 +145,8 @@ class VistaMes extends StatelessWidget {
 
   void _abrirDia(BuildContext context, DateTime dia) {
     final citas = citasStore.agenda
-        .where((c) => mismoDia(c.inicia, dia))
+        .where((c) =>
+            c.estado != EstadoCita.cancelada && mismoDia(c.inicia, dia))
         .toList()
       ..sort((a, b) => a.inicia.compareTo(b.inicia));
     showModalBottomSheet(

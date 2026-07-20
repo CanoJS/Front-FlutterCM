@@ -96,19 +96,29 @@ class _HistorialScreenState extends State<HistorialScreen> {
                     return _errorCarga();
                   }
                   final consultas = _consultas;
-                  if (consultas.isEmpty) {
-                    return const Center(
-                        child: Text('Sin consultas para ese paciente'));
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    itemCount: consultas.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemBuilder: (_, i) => _TarjetaConsulta(
-                      cita: consultas[i],
-                      onTap: () => _mostrarDetalle(consultas[i]),
-                    ),
+                  return RefreshIndicator(
+                    onRefresh: citasStore.cargar,
+                    child: consultas.isEmpty
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: const [
+                              SizedBox(height: 120),
+                              Center(
+                                  child: Text(
+                                      'Sin consultas para ese paciente')),
+                            ],
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            itemCount: consultas.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (_, i) => _TarjetaConsulta(
+                              cita: consultas[i],
+                              onTap: () => _mostrarDetalle(consultas[i]),
+                            ),
+                          ),
                   );
                 },
               ),

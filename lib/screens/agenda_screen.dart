@@ -160,7 +160,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
                         ),
                       );
                     case _Vista.semana:
-                      return SingleChildScrollView(
+                      return RefreshIndicator(
+                        onRefresh: citasStore.cargar,
+                        child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.only(bottom: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,6 +188,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                               child: _CitasDeHoy(onTap: _mostrarDetalle),
                             ),
                           ],
+                        ),
                         ),
                       );
                     case _Vista.lista:
@@ -302,35 +306,48 @@ class _VistaLista extends StatelessWidget {
     final citas = citasStore.agenda.where((c) => enSemana(c.inicia, lunes)).toList()
       ..sort((a, b) => a.inicia.compareTo(b.inicia));
 
+    Widget contenido;
     if (citas.isEmpty) {
-      return const Center(child: Text('No hay citas esta semana'));
-    }
-
-    final porDia = <DateTime, List<Cita>>{};
-    for (final c in citas) {
-      final dia = DateTime(c.inicia.year, c.inicia.month, c.inicia.day);
-      porDia.putIfAbsent(dia, () => []).add(c);
-    }
-    final dias = porDia.keys.toList()..sort();
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        for (final dia in dias) ...[
-          Padding(
-            padding: const EdgeInsets.only(top: 4, bottom: 8),
-            child: Text(
-              cap(DateFormat("EEEE d 'de' MMMM", 'es_MX').format(dia)),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-            ),
-          ),
-          for (final c in porDia[dia]!) ...[
-            TarjetaCita(cita: c, onTap: () => onTap(c)),
-            const SizedBox(height: 10),
-          ],
-          const SizedBox(height: 8),
+      contenido = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 120),
+          Center(child: Text('No hay citas esta semana')),
         ],
-      ],
+      );
+    } else {
+      final porDia = <DateTime, List<Cita>>{};
+      for (final c in citas) {
+        final dia = DateTime(c.inicia.year, c.inicia.month, c.inicia.day);
+        porDia.putIfAbsent(dia, () => []).add(c);
+      }
+      final dias = porDia.keys.toList()..sort();
+
+      contenido = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          for (final dia in dias) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 8),
+              child: Text(
+                cap(DateFormat("EEEE d 'de' MMMM", 'es_MX').format(dia)),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+            ),
+            for (final c in porDia[dia]!) ...[
+              TarjetaCita(cita: c, onTap: () => onTap(c)),
+              const SizedBox(height: 10),
+            ],
+            const SizedBox(height: 8),
+          ],
+        ],
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: citasStore.cargar,
+      child: contenido,
     );
   }
 }

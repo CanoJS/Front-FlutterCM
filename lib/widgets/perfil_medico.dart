@@ -11,27 +11,32 @@ class AvatarMedico extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final medico = authStore.medicoActual;
-    return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: Tooltip(
-        message: 'Perfil',
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () => Scaffold.of(context).openEndDrawer(),
-          child: CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.white.withValues(alpha: 0.25),
-            child: Text(
-              _iniciales(medico?.nombreCompleto ?? ''),
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14),
+    return ListenableBuilder(
+      listenable: authStore,
+      builder: (context, _) {
+        final medico = authStore.medicoActual;
+        return Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Tooltip(
+            message: 'Perfil',
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () => Scaffold.of(context).openEndDrawer(),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
+                child: Text(
+                  _iniciales(medico?.nombreCompleto ?? ''),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -42,95 +47,100 @@ class MedicoDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final medico = authStore.medicoActual;
-
     return Drawer(
       backgroundColor: Colors.white,
       child: SafeArea(
-        child: medico == null
-            ? const Center(child: Text('No hay sesión activa'))
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Encabezado: avatar grande + nombre y especialidad.
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: AppColors.primary600,
-                          child: Text(
-                            _iniciales(medico.nombreCompleto),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18),
-                          ),
+        child: ListenableBuilder(
+          listenable: authStore,
+          builder: (context, _) {
+            final medico = authStore.medicoActual;
+            if (medico == null) {
+              return const Center(child: Text('No hay sesión activa'));
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Encabezado: avatar grande + nombre y especialidad.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: AppColors.primary600,
+                        child: Text(
+                          _iniciales(medico.nombreCompleto),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18),
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                medico.diminutivo,
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.neutral900),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                medico.especialidad.nombre,
-                                style: const TextStyle(
-                                    fontSize: 13, color: AppColors.neutral400),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(height: 1),
-
-                  // Información completa (sin contraseña).
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(20),
-                      children: [
-                        _Campo(etiqueta: 'Nombre', valor: medico.nombreCompleto),
-                        _Campo(etiqueta: 'Correo', valor: medico.email),
-                        _Campo(
-                            etiqueta: 'Especialidad',
-                            valor: medico.especialidad.nombre),
-                        _Campo(
-                            etiqueta: 'Estado',
-                            valor: medico.activo ? 'Activo' : 'Inactivo'),
-                      ],
-                    ),
-                  ),
-
-                  const Divider(height: 1),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _cerrarSesion(context),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.canceladaBorde,
-                          side:
-                              const BorderSide(color: AppColors.canceladaBorde),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Cerrar sesión'),
                       ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              medico.diminutivo,
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.neutral900),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              medico.especialidad.nombre,
+                              style: const TextStyle(
+                                  fontSize: 13, color: AppColors.neutral400),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+
+                // Información completa (sin contraseña).
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      _Campo(etiqueta: 'Nombre', valor: medico.nombreCompleto),
+                      _Campo(etiqueta: 'Correo', valor: medico.email),
+                      _Campo(
+                          etiqueta: 'Especialidad',
+                          valor: medico.especialidad.nombre),
+                      _Campo(etiqueta: 'Rol', valor: _rolLegible(authStore.rol)),
+                      _Campo(
+                          etiqueta: 'Estado',
+                          valor: medico.activo ? 'Activo' : 'Inactivo'),
+                    ],
+                  ),
+                ),
+
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _cerrarSesion(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.canceladaBorde,
+                        side: const BorderSide(color: AppColors.canceladaBorde),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      icon: const Icon(Icons.logout),
+                      label: const Text('Cerrar sesión'),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -182,4 +192,18 @@ String _iniciales(String nombre) {
   if (partes.isEmpty) return '?';
   if (partes.length == 1) return partes.first[0].toUpperCase();
   return (partes[0][0] + partes[1][0]).toUpperCase();
+}
+
+/// Muestra el rol en español.
+String _rolLegible(String? rol) {
+  switch ((rol ?? '').toUpperCase()) {
+    case 'DOCTOR':
+      return 'Médico';
+    case 'ADMIN':
+      return 'Administrador';
+    case 'PATIENT':
+      return 'Paciente';
+    default:
+      return (rol == null || rol.isEmpty) ? '—' : rol;
+  }
 }

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/doctor.dart';
 import '../models/especialidad.dart';
+import 'perfil_api.dart';
 
 /// Posibles resultados de un intento de inicio de sesión.
 enum ResultadoLogin {
@@ -26,8 +27,48 @@ class AuthStore extends ChangeNotifier {
   Doctor? _medicoActual;
   Doctor? get medicoActual => _medicoActual;
 
+  String? _rol;
+  String? get rol => _rol;
+
   bool get haySesion => _supabase.auth.currentSession != null;
   String? get accessToken => _supabase.auth.currentSession?.accessToken;
+
+  /// Carga el perfil completo del médico desde la API: identidad (/users/me)
+  /// + especialidad (/doctors, buscándose por correo). Si falla, conserva el
+  /// perfil provisional armado desde Supabase.
+  Future<void> cargarPerfil() async {
+    try {
+      final me = await perfilApi.obtenerUsuarioActual();
+      _rol = me.role;
+
+      Doctor? doctor;
+      try {
+        final doctores = await perfilApi.obtenerDoctores();
+        for (final d in doctores) {
+          if (d.email.toLowerCase() == me.email.toLowerCase()) {
+            doctor = d;
+            break;
+          }
+        }
+      } catch (_) {
+        // /doctors puede no estar disponible para este rol; se ignora.
+      }
+
+      _medicoActual = Doctor(
+        id: doctor?.id ?? me.id,
+        nombreCompleto: (doctor != null && doctor.nombreCompleto.isNotEmpty)
+            ? doctor.nombreCompleto
+            : me.nombreCompleto,
+        email: me.email,
+        especialidad:
+            doctor?.especialidad ?? const Especialidad(id: '', nombre: '—'),
+        activo: me.active,
+      );
+      notifyListeners();
+    } catch (_) {
+      // Sin conexión o error: se conserva el perfil provisional.
+    }
+  }
 
   /// Inicia sesión con correo y contraseña contra Supabase.
   Future<ResultadoLogin> iniciarSesion(String email, String password) async {
@@ -61,6 +102,7 @@ class AuthStore extends ChangeNotifier {
   Future<void> cerrarSesion() async {
     await _supabase.auth.signOut();
     _medicoActual = null;
+    _rol = null;
     notifyListeners();
   }
 
