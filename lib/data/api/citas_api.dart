@@ -1,4 +1,4 @@
-import '../models/cita.dart';
+import '../../models/cita.dart';
 import 'api_client.dart';
 
 /// Llamadas a la API relacionadas con las citas (appointments).

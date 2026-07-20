@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../config/env.dart';
-import 'auth_store.dart';
+import '../../config/env.dart';
+import '../services/auth_store.dart';
 
 /// Excepción de una respuesta HTTP no exitosa.
 class ApiException implements Exception {

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../data/auth_store.dart';
-import '../data/citas_store.dart';
+import '../data/services/auth_store.dart';
+import '../data/services/citas_store.dart';
 import '../theme/app_colors.dart'; // ajusta si tu ruta difiere
 import 'agenda_screen.dart';
 import 'historial_screen.dart';

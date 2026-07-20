@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/doctor.dart';
-import '../models/especialidad.dart';
-import 'perfil_api.dart';
+import '../../models/doctor.dart';
+import '../../models/especialidad.dart';
+import '../api/perfil_api.dart';
 
 /// Posibles resultados de un intento de inicio de sesión.
 enum ResultadoLogin {
@@ -51,7 +51,7 @@ class AuthStore extends ChangeNotifier {
           }
         }
       } catch (_) {
-        // /doctors puede no estar disponible para este rol; se ignora.
+        
       }
 
       _medicoActual = Doctor(

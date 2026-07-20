@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../data/citas_store.dart';
+import '../data/services/citas_store.dart';
 import '../models/cita.dart';
 import '../theme/app_colors.dart';
 import '../utils/fechas.dart';
@@ -217,7 +217,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 }
 
-// ───────────────────────── Barra de navegación de semana ─────────────────────────
+// Barra de navegación de semana 
 
 class _BarraSemana extends StatelessWidget {
   final DateTime lunes;
@@ -263,7 +263,7 @@ class _BarraSemana extends StatelessWidget {
   }
 }
 
-// ───────────────────────── Apartado "Citas de hoy" ─────────────────────────
+//  Apartado "Citas de hoy"
 
 class _CitasDeHoy extends StatelessWidget {
   final void Function(Cita) onTap;
@@ -294,7 +294,7 @@ class _CitasDeHoy extends StatelessWidget {
   }
 }
 
-// ───────────────────────── Vista de lista (por día) ─────────────────────────
+// Vista de lista (por día)
 
 class _VistaLista extends StatelessWidget {
   final DateTime lunes;
@@ -352,7 +352,7 @@ class _VistaLista extends StatelessWidget {
   }
 }
 
-// ───────────────────────── Barra de navegación de mes ─────────────────────────
+// Barra de navegación de mes 
 
 class _BarraMes extends StatelessWidget {
   final DateTime mes;

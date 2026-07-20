@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../data/auth_store.dart';
+import '../data/services/auth_store.dart';
 import '../theme/app_colors.dart';
 import '../widgets/glass_card.dart';
 import 'home_screen.dart';

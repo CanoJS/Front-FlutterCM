@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/citas_store.dart';
+import '../../data/services/citas_store.dart';
 import '../../models/cita.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/estado_cita_colors.dart';
