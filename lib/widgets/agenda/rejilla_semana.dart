@@ -16,8 +16,11 @@ class RejillaSemana extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dias = List.generate(5, (i) => lunes.add(Duration(days: i)));
-    final citasSemana =
-        citasStore.agenda.where((c) => enSemana(c.inicia, lunes)).toList();
+    // Las canceladas no ocupan espacio en la rejilla (se ve el hueco libre).
+    final citasSemana = citasStore.agenda
+        .where((c) =>
+            c.estado != EstadoCita.cancelada && enSemana(c.inicia, lunes))
+        .toList();
     final mapa = _mapaCitas(citasSemana);
 
     return Padding(

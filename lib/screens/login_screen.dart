@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _correoCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   String? _error;
+  bool _cargando = false;
 
   @override
   void dispose() {
@@ -25,8 +26,18 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _iniciarSesion() {
-    final resultado = authStore.iniciarSesion(_correoCtrl.text, _passCtrl.text);
+  Future<void> _iniciarSesion() async {
+    if (_cargando) return;
+    setState(() {
+      _error = null;
+      _cargando = true;
+    });
+
+    final resultado =
+        await authStore.iniciarSesion(_correoCtrl.text, _passCtrl.text);
+    if (!mounted) return;
+    setState(() => _cargando = false);
+
     switch (resultado) {
       case ResultadoLogin.exito:
         Navigator.of(context).pushReplacement(
@@ -39,6 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
       case ResultadoLogin.cuentaInactiva:
         setState(() => _error =
             'Tu cuenta está inactiva. Contacta al equipo de MediClick.');
+      case ResultadoLogin.errorConexion:
+        setState(() => _error =
+            'No se pudo conectar. Revisa tu internet e inténtalo de nuevo.');
     }
   }
 
@@ -145,17 +159,25 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             height: 52,
             child: FilledButton(
-              onPressed: _iniciarSesion,
+              onPressed: _cargando ? null : _iniciarSesion,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primary600,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Iniciar sesión',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
+              child: _cargando
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.5, color: Colors.white),
+                    )
+                  : const Text(
+                      'Iniciar sesión',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
             ),
           ),
           const SizedBox(height: 16),

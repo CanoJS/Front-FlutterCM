@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import '../data/auth_store.dart';
+import '../data/citas_store.dart';
 import '../theme/app_colors.dart'; // ajusta si tu ruta difiere
 import 'agenda_screen.dart';
 import 'historial_screen.dart';
@@ -18,6 +22,27 @@ class _HomeShellState extends State<HomeShell> {
     AgendaScreen(),
     HistorialScreen(),
   ];
+
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Carga las citas y el perfil completo del médico al entrar al portal.
+    citasStore.cargar();
+    authStore.cargarPerfil();
+    // Auto-refresco periódico para reflejar nuevas citas agendadas.
+    _timer = Timer.periodic(
+      const Duration(seconds: 61),
+      (_) => citasStore.cargar(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

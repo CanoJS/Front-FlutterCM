@@ -20,6 +20,7 @@ class DetalleCita extends StatefulWidget {
 class _DetalleCitaState extends State<DetalleCita> {
   final _notaCtrl = TextEditingController();
   bool _agregandoNota = false;
+  bool _guardando = false;
 
   @override
   void dispose() {
@@ -27,12 +28,26 @@ class _DetalleCitaState extends State<DetalleCita> {
     super.dispose();
   }
 
-  void _guardar() {
-    citasStore.marcarAtendida(widget.cita, _notaCtrl.text);
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Cita marcada como atendida')),
-    );
+  Future<void> _guardar() async {
+    setState(() => _guardando = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    try {
+      await citasStore.marcarAtendida(widget.cita, _notaCtrl.text);
+      navigator.pop();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Cita marcada como atendida')),
+      );
+    } catch (e) {
+      debugPrint('ATTEND ERROR ▶ $e');
+      if (!mounted) return;
+      setState(() => _guardando = false);
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo marcar la cita. Intenta de nuevo.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -41,6 +56,8 @@ class _DetalleCitaState extends State<DetalleCita> {
     final fecha =
         cap(DateFormat("EEEE d 'de' MMMM 'de' y", 'es_MX').format(cita.inicia));
     final atendida = cita.estado == EstadoCita.atendida;
+    // El backend solo permite atender una cita una vez que ya inició.
+    final yaInicio = !DateTime.now().isBefore(cita.inicia);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -65,6 +82,21 @@ class _DetalleCitaState extends State<DetalleCita> {
             const SizedBox(height: 6),
             Text(cita.notaMedica ?? 'Sin nota registrada',
                 style: const TextStyle(fontSize: 16, height: 1.4)),
+          ] else if (!yaInicio) ...[
+            Row(
+              children: [
+                const Icon(Icons.schedule,
+                    size: 18, color: AppColors.neutral400),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Podrás marcarla como atendida a partir de su hora de inicio.',
+                    style:
+                        TextStyle(fontSize: 13, color: AppColors.neutral400),
+                  ),
+                ),
+              ],
+            ),
           ] else if (!_agregandoNota) ...[
             SizedBox(
               width: double.infinity,
@@ -98,15 +130,26 @@ class _DetalleCitaState extends State<DetalleCita> {
             Row(
               children: [
                 FilledButton(
-                  onPressed: _notaCtrl.text.trim().isEmpty ? null : _guardar,
-                  child: const Text('Guardar'),
+                  onPressed: (_notaCtrl.text.trim().isEmpty || _guardando)
+                      ? null
+                      : _guardar,
+                  child: _guardando
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child:
+                              CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Guardar'),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton(
-                  onPressed: () => setState(() {
-                    _agregandoNota = false;
-                    _notaCtrl.clear();
-                  }),
+                  onPressed: _guardando
+                      ? null
+                      : () => setState(() {
+                            _agregandoNota = false;
+                            _notaCtrl.clear();
+                          }),
                   child: const Text('Cancelar'),
                 ),
               ],

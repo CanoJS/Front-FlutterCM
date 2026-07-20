@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'config/env.dart';
 import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'widgets/gradient_blob_background.dart';
@@ -7,6 +10,11 @@ import 'widgets/gradient_blob_background.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_MX');
+  await dotenv.load(fileName: '.env');
+  await Supabase.initialize(
+    url: Env.supabaseUrl,
+    publishableKey: Env.supabasePublishableKey,
+  );
   runApp(const PortalMedicoApp());
 }
 

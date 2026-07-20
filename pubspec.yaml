@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   intl: ^0.20.3
   flutter_svg: ^2.3.0
+  flutter_dotenv: ^6.0.1
+  supabase_flutter: ^2.16.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +59,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/images/
 
   # To add assets to your application, add an assets section, like this:

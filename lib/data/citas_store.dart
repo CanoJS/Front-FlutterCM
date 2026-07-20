@@ -1,36 +1,54 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/cita.dart';
-import 'mock_citas.dart';
+import 'citas_api.dart';
 
-/// Estado en memoria de las citas.
-///
-/// Parte de los datos mock y vive solo mientras la app está abierta:
-/// al reiniciar la aplicación se vuelve a sembrar desde los mocks, por eso
-/// "marcar como atendida" es únicamente una simulación que no persiste.
+/// Estado en memoria de las citas del médico, cargadas desde la API.
 class CitasStore extends ChangeNotifier {
   CitasStore._();
   static final CitasStore instance = CitasStore._();
 
-  final List<Cita> agenda = List.of(agendaMock);
-  final List<Cita> historial = List.of(historialMock);
+  List<Cita> _citas = [];
+  bool _cargando = false;
+  String? _error;
 
-  /// Marca una cita de la agenda como atendida, le agrega la nota médica y la
-  /// coloca al inicio del historial (como la consulta más reciente).
-  void marcarAtendida(Cita cita, String nota) {
-    final texto = nota.trim();
-    final atendida = cita.copyWith(
-      estado: EstadoCita.atendida,
-      notaMedica: texto.isEmpty ? null : texto,
-    );
+  bool get cargando => _cargando;
+  String? get error => _error;
 
-    final i = agenda.indexWhere((c) => c.id == cita.id);
-    if (i != -1) agenda[i] = atendida;
+  /// Todas las citas (la agenda las filtra por semana/día).
+  List<Cita> get agenda => _citas;
 
-    historial.removeWhere((c) => c.id == atendida.id);
-    historial.insert(0, atendida);
+  /// Solo las atendidas, de la más reciente a la más antigua.
+  List<Cita> get historial {
+    final atendidas = _citas.where((c) => c.atendida).toList()
+      ..sort((a, b) => b.inicia.compareTo(a.inicia));
+    return atendidas;
+  }
 
+  /// Carga (o recarga) las citas desde la API.
+  Future<void> cargar() async {
+    _cargando = true;
+    _error = null;
     notifyListeners();
+    try {
+      _citas = await citasApi.obtenerCitas();
+    } catch (_) {
+      _error = 'No se pudieron cargar las citas.';
+    } finally {
+      _cargando = false;
+      notifyListeners();
+    }
+  }
+
+  /// Marca una cita como atendida en el backend (guardando la nota médica)
+  /// y recarga las citas para reflejar el estado real del servidor.
+  Future<void> marcarAtendida(Cita cita, String nota) async {
+    await citasApi.atenderCita(
+      id: cita.id,
+      medicalNote: nota.trim(),
+      version: cita.version,
+    );
+    await cargar();
   }
 }
 

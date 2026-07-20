@@ -38,6 +38,27 @@ class _HistorialScreenState extends State<HistorialScreen> {
     );
   }
 
+  Widget _errorCarga() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.cloud_off, size: 40, color: AppColors.neutral400),
+          const SizedBox(height: 12),
+          Text(citasStore.error ?? 'Ocurrió un error',
+              style: const TextStyle(color: AppColors.neutral400)),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () {
+              citasStore.cargar();
+            },
+            child: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,20 +88,37 @@ class _HistorialScreenState extends State<HistorialScreen> {
               child: ListenableBuilder(
                 listenable: citasStore,
                 builder: (context, _) {
-                  final consultas = _consultas;
-                  if (consultas.isEmpty) {
-                    return const Center(
-                        child: Text('Sin consultas para ese paciente'));
+                  if (citasStore.cargando && citasStore.historial.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    itemCount: consultas.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemBuilder: (_, i) => _TarjetaConsulta(
-                      cita: consultas[i],
-                      onTap: () => _mostrarDetalle(consultas[i]),
-                    ),
+                  if (citasStore.error != null &&
+                      citasStore.historial.isEmpty) {
+                    return _errorCarga();
+                  }
+                  final consultas = _consultas;
+                  return RefreshIndicator(
+                    onRefresh: citasStore.cargar,
+                    child: consultas.isEmpty
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: const [
+                              SizedBox(height: 120),
+                              Center(
+                                  child: Text(
+                                      'Sin consultas para ese paciente')),
+                            ],
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            itemCount: consultas.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (_, i) => _TarjetaConsulta(
+                              cita: consultas[i],
+                              onTap: () => _mostrarDetalle(consultas[i]),
+                            ),
+                          ),
                   );
                 },
               ),
