@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/auth_store.dart';
+import '../data/services/auth_store.dart';
 import '../screens/login_screen.dart';
 import '../theme/app_colors.dart';
 
@@ -111,11 +111,7 @@ class MedicoDrawer extends StatelessWidget {
                       _Campo(etiqueta: 'Correo', valor: medico.email),
                       _Campo(
                           etiqueta: 'Especialidad',
-                          valor: medico.especialidad.nombre),
-                      _Campo(etiqueta: 'Rol', valor: _rolLegible(authStore.rol)),
-                      _Campo(
-                          etiqueta: 'Estado',
-                          valor: medico.activo ? 'Activo' : 'Inactivo'),
+                          valor: medico.especialidad.nombre)
                     ],
                   ),
                 ),
@@ -154,7 +150,7 @@ class MedicoDrawer extends StatelessWidget {
   }
 }
 
-/// Campo etiqueta (gris) + valor (negro), como en las tarjetas de las citas.
+/// Campo etiqueta (gris) + valor (negro).
 class _Campo extends StatelessWidget {
   final String etiqueta;
   final String valor;
@@ -194,16 +190,4 @@ String _iniciales(String nombre) {
   return (partes[0][0] + partes[1][0]).toUpperCase();
 }
 
-/// Muestra el rol en español.
-String _rolLegible(String? rol) {
-  switch ((rol ?? '').toUpperCase()) {
-    case 'DOCTOR':
-      return 'Médico';
-    case 'ADMIN':
-      return 'Administrador';
-    case 'PATIENT':
-      return 'Paciente';
-    default:
-      return (rol == null || rol.isEmpty) ? '—' : rol;
-  }
-}
+

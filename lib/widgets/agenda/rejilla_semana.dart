@@ -1,25 +1,49 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/citas_store.dart';
+import '../../data/services/citas_store.dart';
 import '../../models/cita.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/estado_cita_colors.dart';
 import '../../utils/fechas.dart';
 
 /// Rejilla de la semana (lunes a viernes, 08:00–17:30) con cada cita en su franja.
-class RejillaSemana extends StatelessWidget {
+class RejillaSemana extends StatefulWidget {
   final DateTime lunes;
   final void Function(Cita) onTap;
   const RejillaSemana({super.key, required this.lunes, required this.onTap});
 
   @override
+  State<RejillaSemana> createState() => _RejillaSemanaState();
+}
+
+class _RejillaSemanaState extends State<RejillaSemana> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reconstruye cada 60 s para mover la línea roja de "ahora".
+    _timer = Timer.periodic(const Duration(seconds: 60), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final dias = List.generate(5, (i) => lunes.add(Duration(days: i)));
+    final dias = List.generate(5, (i) => widget.lunes.add(Duration(days: i)));
     // Las canceladas no ocupan espacio en la rejilla (se ve el hueco libre).
     final citasSemana = citasStore.agenda
         .where((c) =>
-            c.estado != EstadoCita.cancelada && enSemana(c.inicia, lunes))
+            c.estado != EstadoCita.cancelada && enSemana(c.inicia, widget.lunes))
         .toList();
     final mapa = _mapaCitas(citasSemana);
 
@@ -149,7 +173,7 @@ class RejillaSemana extends StatelessWidget {
     return SizedBox.expand(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => onTap(cita),
+        onTap: () => widget.onTap(cita),
         child: Container(
           margin: const EdgeInsets.all(1.5),
           clipBehavior: Clip.antiAlias,

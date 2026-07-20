@@ -1,4 +1,4 @@
-import '../models/doctor.dart';
+import '../../models/doctor.dart';
 import 'api_client.dart';
 
 /// Identidad del usuario autenticado (GET /api/v1/users/me).

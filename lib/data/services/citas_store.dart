@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/cita.dart';
-import 'citas_api.dart';
+import '../../models/cita.dart';
+import '../api/citas_api.dart';
 
 /// Estado en memoria de las citas del médico, cargadas desde la API.
 class CitasStore extends ChangeNotifier {
